@@ -1,0 +1,222 @@
+```cpp
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+struct Student
+{
+    int rollno;
+    string name;
+    int age;
+    string course;
+    float marks;
+};
+
+void addStudent()
+{
+    Student s;
+
+    cout << "\nEnter Roll No: ";
+    cin >> s.rollno;
+
+    cin.ignore();
+
+    cout << "Enter Name: ";
+    getline(cin, s.name);
+
+    cout << "Enter Age: ";
+    cin >> s.age;
+
+    cin.ignore();
+
+    cout << "Enter Course: ";
+    getline(cin, s.course);
+
+    cout << "Enter Marks: ";
+    cin >> s.marks;
+
+    ofstream file("students.txt", ios::app);
+
+    file << s.rollno << "|"
+         << s.name << "|"
+         << s.age << "|"
+         << s.course << "|"
+         << s.marks << endl;
+
+    file.close();
+
+    cout << "\nStudent added successfully.\n";
+}
+
+void displayStudents()
+{
+    Student s;
+    string line;
+
+    ifstream file("students.txt");
+
+    if (!file)
+    {
+        cout << "\nNo records found.\n";
+        return;
+    }
+
+    cout << "\n-------- Student Records --------\n";
+
+    while (getline(file, line))
+    {
+        size_t p1 = line.find("|");
+        size_t p2 = line.find("|", p1 + 1);
+        size_t p3 = line.find("|", p2 + 1);
+        size_t p4 = line.find("|", p3 + 1);
+
+        s.rollno = stoi(line.substr(0, p1));
+        s.name = line.substr(p1 + 1, p2 - p1 - 1);
+        s.age = stoi(line.substr(p2 + 1, p3 - p2 - 1));
+        s.course = line.substr(p3 + 1, p4 - p3 - 1);
+        s.marks = stof(line.substr(p4 + 1));
+
+        cout << "\nRoll No : " << s.rollno;
+        cout << "\nName    : " << s.name;
+        cout << "\nAge     : " << s.age;
+        cout << "\nCourse  : " << s.course;
+        cout << "\nMarks   : " << s.marks;
+        cout << "\n-----------------------------";
+    }
+
+    file.close();
+}
+
+void searchStudent()
+{
+    Student s;
+    string line;
+    int roll;
+    bool found = false;
+
+    cout << "\nEnter Roll No to search: ";
+    cin >> roll;
+
+    ifstream file("students.txt");
+
+    while (getline(file, line))
+    {
+        size_t p1 = line.find("|");
+        size_t p2 = line.find("|", p1 + 1);
+        size_t p3 = line.find("|", p2 + 1);
+        size_t p4 = line.find("|", p3 + 1);
+
+        s.rollno = stoi(line.substr(0, p1));
+        s.name = line.substr(p1 + 1, p2 - p1 - 1);
+        s.age = stoi(line.substr(p2 + 1, p3 - p2 - 1));
+        s.course = line.substr(p3 + 1, p4 - p3 - 1);
+        s.marks = stof(line.substr(p4 + 1));
+
+        if (s.rollno == roll)
+        {
+            cout << "\nStudent Found";
+            cout << "\nRoll No : " << s.rollno;
+            cout << "\nName    : " << s.name;
+            cout << "\nAge     : " << s.age;
+            cout << "\nCourse  : " << s.course;
+            cout << "\nMarks   : " << s.marks << endl;
+
+            found = true;
+            break;
+        }
+    }
+
+    file.close();
+
+    if (!found)
+        cout << "\nStudent not found.\n";
+}
+
+void deleteStudent()
+{
+    string line;
+    int roll;
+    bool found = false;
+
+    cout << "\nEnter Roll No to delete: ";
+    cin >> roll;
+
+    ifstream file("students.txt");
+    ofstream temp("temp.txt");
+
+    while (getline(file, line))
+    {
+        size_t pos = line.find("|");
+
+        int r = stoi(line.substr(0, pos));
+
+        if (r == roll)
+        {
+            found = true;
+        }
+        else
+        {
+            temp << line << endl;
+        }
+    }
+
+    file.close();
+    temp.close();
+
+    remove("students.txt");
+    rename("temp.txt", "students.txt");
+
+    if (found)
+        cout << "\nStudent deleted successfully.\n";
+    else
+        cout << "\nStudent not found.\n";
+}
+
+int main()
+{
+    int choice;
+
+    do
+    {
+        cout << "\n\n===== Student Management System =====";
+        cout << "\n1. Add Student";
+        cout << "\n2. Display Students";
+        cout << "\n3. Search Student";
+        cout << "\n4. Delete Student";
+        cout << "\n5. Exit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            addStudent();
+            break;
+
+        case 2:
+            displayStudents();
+            break;
+
+        case 3:
+            searchStudent();
+            break;
+
+        case 4:
+            deleteStudent();
+            break;
+
+        case 5:
+            cout << "\nProgram ended.\n";
+            break;
+
+        default:
+            cout << "\nInvalid choice.";
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
+```
